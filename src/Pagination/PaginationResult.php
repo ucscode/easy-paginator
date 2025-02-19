@@ -34,7 +34,7 @@ class PaginationResult implements \IteratorAggregate
             ;
         }
     }
-    
+
     public function getPaginator(): Paginator
     {
         return $this->paginator;
@@ -52,6 +52,25 @@ class PaginationResult implements \IteratorAggregate
     {
         return $this->items;
     }
+
+    public function getCurrentPageFirstItemNumber(): ?int
+    {
+        $first = $this->paginator->getCurrentPageOffset() + 1;
+
+        return $first > $this->paginator->getTotalItems() ? null : $first;
+    }
+
+    public function getCurrentPageLastItemNumber(): ?int
+    {
+        if (null === $first = $this->getCurrentPageFirstItemNumber()) {
+            return null;
+        }
+
+        $last = $first + $this->paginator->getItemsPerPage() - 1;
+
+        return $last > $this->paginator->getTotalItems() ? $this->paginator->getTotalItems() : $last;
+    }
+
 
     protected function createPaginationStack(): void
     {

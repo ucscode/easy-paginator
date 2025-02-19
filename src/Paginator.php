@@ -150,24 +150,19 @@ class Paginator
         return $this->getPageUrl($this->getPrevPage());
     }
 
-    public function getCurrentPageFirstItem(): ?int
+    /**
+     * Get the offset of the first item on the current page.
+     *
+     * This offset is zero-based and can be used for array slicing
+     * or database queries with LIMIT and OFFSET.
+     *
+     * Example: array_slice([], $paginator->getCurrentPageOffset(), $paginator->getItemsPerPage())
+     *
+     * @return int The starting index of the current page items.
+     */
+    public function getCurrentPageOffset(): int
     {
-        $first = ($this->getCurrentPage() - 1) * $this->getItemsPerPage() + 1;
-
-        return $first > $this->getTotalItems() ? null : $first;
-    }
-
-    public function getCurrentPageLastItem(): ?int
-    {
-        $first = $this->getCurrentPageFirstItem();
-
-        if ($first === null) {
-            return null;
-        }
-
-        $last = $first + $this->getItemsPerPage() - 1;
-
-        return $last > $this->getTotalItems() ? $this->getTotalItems() : $last;
+        return ($this->getCurrentPage() - 1) * $this->getItemsPerPage();
     }
 
     public function getResult(int $maxPagesToShow = 10): PaginationResult
