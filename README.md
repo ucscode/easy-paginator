@@ -1,8 +1,8 @@
 # Easy Paginator
 
-## Introduction
-
 Ucscode Paginator is a lightweight PHP pagination library designed to handle paginated data efficiently. It provides an easy-to-use interface for managing and generating pagination links.
+
+This project requires a minimum of PHP 8.2
 
 ## Installation
 
@@ -21,7 +21,7 @@ $paginator = new Paginator(
     totalItems: 100,       // Total number of items
     itemsPerPage: 10,      // Items per page
     currentPage: 3,        // Current page
-    urlPattern: 'http://domain.com/path/?page=(:num)' // URL pattern with placeholder
+    urlPattern: '?page=(:num)' // URL pattern with placeholder
 );
 ```
 
@@ -101,3 +101,11 @@ The `PaginationBuilder` generates the following HTML structure:
     </ul>
 </div>
 ```
+
+## Acknowledgement
+
+Inspired by [jasongrimes/php-paginator](https://github.com/jasongrimes/php-paginator/tree/master)
+
+## Licence
+
+Easy Paginator is licensed under the [MIT License](./LICENSE).
