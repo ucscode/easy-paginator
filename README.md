@@ -1,3 +1,3 @@
-Uscode Paginator
+Easy Paginator
 =============
 

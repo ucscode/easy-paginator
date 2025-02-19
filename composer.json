@@ -1,5 +1,5 @@
 {
-    "name": "ucscode/paginator",
+    "name": "ucscode/easy-paginator",
     "type": "library",
     "description": "",
     "keywords": [
@@ -7,7 +7,7 @@
         "pagination", 
         "pager"
     ],
-    "homepage": "http://github.com/ucscode/php-paginator",
+    "homepage": "http://github.com/ucscode/easy-paginator",
     "license": "MIT",
     "authors": [
         {
