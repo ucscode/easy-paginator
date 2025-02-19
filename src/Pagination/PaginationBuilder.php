@@ -48,7 +48,7 @@ class PaginationBuilder implements \Stringable
             $ulElement->appendChild($prevLiElement);
         }
 
-        foreach ($this->paginationResult->getItems() as $item) {
+        foreach ($this->paginationResult as $item) {
             $pagerElement = $item['url'] ?
                 $this->configurePagerElement(
                     $item['url'],
