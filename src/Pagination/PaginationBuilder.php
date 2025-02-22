@@ -114,11 +114,15 @@ class PaginationBuilder implements \Stringable
             'class' => new ClassList(['page-item', $classes]),
         ]);
 
+        $attributes = new Attributes([
+            'class' => new ClassList(['page-link']),
+        ]);
+
+        !$href ?: $attributes->set('href', $href);
+        
         $innerElement = new ElementNode(
             $href ? NodeNameEnum::NODE_A : NodeNameEnum::NODE_SPAN,
-            new Attributes([
-                'class' => new ClassList(['page-link']),
-            ])
+            $attributes
         );
 
         if (!$text instanceof NodeInterface) {
