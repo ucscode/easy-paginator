@@ -4,6 +4,7 @@ namespace Ucscode\Paginator\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Ucscode\Paginator\Pagination\BuilderFactory;
 use Ucscode\Paginator\Paginator;
 
 class PaginatorTest extends TestCase
@@ -71,8 +72,8 @@ class PaginatorTest extends TestCase
     public function testGetPages($numPages, $currentPage, $maxPages, $expected)
     {
         $paginator = new Paginator($numPages, 1, $currentPage);
-        $pages = $paginator->getResult($maxPages)->getItems();
-        $pageNums = array_map(fn ($page) => $page['pageNum'], $pages);
+        $pages = $paginator->getBuilder($maxPages)->getItems();
+        $pageNums = \array_map(fn ($page) => $page->getContent(), $pages);
 
         $this->assertEquals($expected, $pageNums);
     }
@@ -104,9 +105,8 @@ class PaginatorTest extends TestCase
         $paginator = new Paginator($numItems, $itemsPerPage, $currentPage);
 
         $this->assertEquals($numItems, $paginator->getTotalItems());
-        $this->assertEquals($expectedFirst, $paginator->getResult()->getCurrentPageFirstItemNumber());
-        $this->assertEquals($expectedLast, $paginator->getResult()->getCurrentPageLastItemNumber());
-
+        $this->assertEquals($expectedFirst, $paginator->getCurrentPageFirstItemNumber());
+        $this->assertEquals($expectedLast, $paginator->getCurrentPageLastItemNumber());
     }
 
     public static function getRangeData()
@@ -119,5 +119,4 @@ class PaginatorTest extends TestCase
             array(95, 10, 11, null, null), // If current page exceeds total items, first and last item are null.
         );
     }
-
 }

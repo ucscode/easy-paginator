@@ -2,8 +2,9 @@
 
 namespace Ucscode\Paginator;
 
-use Ucscode\Paginator\Pagination\PaginationBuilder;
-use Ucscode\Paginator\Pagination\PaginationResult;
+use Ucscode\Paginator\Pagination\Builder;
+use Ucscode\Paginator\Pagination\BuilderFactory;
+use Ucscode\Paginator\Pagination\Contracts\BuilderFactoryInterface;
 
 class Paginator
 {
@@ -11,42 +12,37 @@ class Paginator
 
     /**
      * The total number of items to be paginated
-     *
      * @var integer
      */
     protected int $totalItems = 0;
 
     /**
      * The number of items that should be render per page
-     *
      * @var integer
      */
     protected int $itemsPerPage = 10;
 
     /**
      * The current page number
-     *
      * @var integer
      */
     protected int $currentPage = 1;
 
     /**
-     * The total number of pages required for pagination
-     *
-     * @var integer
-     */
-    protected int $totalPages;
-
-    /**
      * URL pattern for generating pagination links
-     *
      * @var string
      */
     protected string $urlPattern;
 
-    public function __construct(int $totalItems = 0, int $itemsPerPage = 10, int $currentPage = 1, string $urlPattern = '?page=' . self::NUM_PLACEHOLDER)
+    /**
+     * The total number of pages available for pagination
+     * @var integer
+     */
+    protected int $totalPages;
+
+    public function __construct(?int $totalItems = null, int $itemsPerPage = 10, int $currentPage = 1, string $urlPattern = '?page=' . self::NUM_PLACEHOLDER)
     {
-        $this->totalItems = $totalItems;
+        $this->totalItems = $totalItems ?? 0;
         $this->itemsPerPage = $itemsPerPage;
         $this->currentPage = $currentPage;
         $this->urlPattern = $urlPattern;
@@ -92,29 +88,6 @@ class Paginator
         return $this->currentPage;
     }
 
-    public function getTotalPages(): int
-    {
-        return $this->totalPages;
-    }
-
-    public function getNextPage(): ?int
-    {
-        if ($this->currentPage < $this->totalPages) {
-            return $this->currentPage + 1;
-        }
-
-        return null;
-    }
-
-    public function getPrevPage(): ?int
-    {
-        if ($this->currentPage > 1) {
-            return $this->currentPage - 1;
-        }
-
-        return null;
-    }
-
     public function setUrlPattern(string $urlPattern): static
     {
         $this->urlPattern = $urlPattern;
@@ -127,56 +100,72 @@ class Paginator
         return $this->urlPattern;
     }
 
-    public function getPageUrl(int $pageNum): string
+    public function getTotalPages(): int
     {
-        return str_replace(self::NUM_PLACEHOLDER, $pageNum, $this->urlPattern);
+        return $this->totalPages;
+    }
+
+    public function getNextPage(): ?int
+    {
+        return ($this->currentPage < $this->totalPages) ? ($this->currentPage + 1) : null;
+    }
+
+    public function getPrevPage(): ?int
+    {
+        return ($this->currentPage > 1) ? ($this->currentPage - 1) : null;
     }
 
     public function getNextUrl(): ?string
     {
-        if (!$this->getNextPage()) {
-            return null;
-        }
-
-        return $this->getPageUrl($this->getNextPage());
+        return $this->getNextPage() ? $this->getPageUrl($this->getNextPage()) : null;
     }
 
     public function getPrevUrl(): ?string
     {
-        if (!$this->getPrevPage()) {
-            return null;
-        }
+        return $this->getPrevPage() ? $this->getPageUrl($this->getPrevPage()) : null;
+    }
 
-        return $this->getPageUrl($this->getPrevPage());
+    public function getPageUrl(int $pageNum): string
+    {
+        return \str_replace(self::NUM_PLACEHOLDER, $pageNum, $this->urlPattern);
     }
 
     /**
-     * Get the offset of the first item on the current page.
+     * Get the offset from which the current page items start
      *
-     * This offset is zero-based and can be used for array slicing
-     * or database queries with LIMIT and OFFSET.
-     *
-     * Example: array_slice([], $paginator->getCurrentPageOffset(), $paginator->getItemsPerPage())
-     *
-     * @return int The starting index of the current page items.
+     * This offset is zero-based and can be used for array slicing or database queries with LIMIT and OFFSET.
+     * Example: array_slice([...], $paginator->getCurrentPageOffset(), $paginator->getItemsPerPage())
      */
     public function getCurrentPageOffset(): int
     {
         return ($this->getCurrentPage() - 1) * $this->getItemsPerPage();
     }
 
-    public function getResult(int $maxPagesToShow = 10): PaginationResult
+    public function getCurrentPageFirstItemNumber(): ?int
     {
-        return new PaginationResult($this, $maxPagesToShow);
+        $first = $this->getCurrentPageOffset() + 1;
+
+        return $first > $this->getTotalItems() ? null : $first;
     }
 
-    public function getBuilder(int $maxPagesToShow = 10): PaginationBuilder
+    public function getCurrentPageLastItemNumber(): ?int
     {
-        return new PaginationBuilder($this->getResult($maxPagesToShow));
+        if (null === $first = $this->getCurrentPageFirstItemNumber()) {
+            return null;
+        }
+
+        $last = $first + $this->getItemsPerPage() - 1;
+
+        return $last > $this->getTotalItems() ? $this->getTotalItems() : $last;
+    }
+
+    public function getBuilder(int $maxVisibleItems = 10): Builder
+    {
+        return new Builder(new BuilderFactory($this, $maxVisibleItems));
     }
 
     protected function updatePaginator()
     {
-        $this->totalPages = ($this->itemsPerPage == 0 ? 0 : (int) ceil($this->totalItems / $this->itemsPerPage));
+        $this->totalPages = $this->itemsPerPage === 0 ? 0 : (int) ceil($this->totalItems / $this->itemsPerPage);
     }
 }
