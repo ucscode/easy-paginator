@@ -3,8 +3,6 @@
 namespace Ucscode\Paginator;
 
 use Ucscode\Paginator\Pagination\Builder;
-use Ucscode\Paginator\Pagination\BuilderFactory;
-use Ucscode\Paginator\Pagination\Contracts\BuilderFactoryInterface;
 
 class Paginator
 {
@@ -161,7 +159,7 @@ class Paginator
 
     public function getBuilder(int $maxVisibleItems = 10): Builder
     {
-        return new Builder(new BuilderFactory($this, $maxVisibleItems));
+        return new Builder($this, $maxVisibleItems);
     }
 
     protected function updatePaginator()

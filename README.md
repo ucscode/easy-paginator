@@ -40,67 +40,104 @@ $paginator->getNextUrl();  // URL for the next page
 $paginator->getPrevUrl();  // URL for the previous page
 ```
 
-## Pagination Result
+## Pagination Builder
 
-The `PaginationResult` class generates an array of pagination data, which can be iterated to display page links.
+The `Builder` class generates an array of `Item`, which can be iterated to display page links.
 
 ### Example
-```php
-use Ucscode\Paginator\Pagination\PaginationResult;
 
-$result = $paginator->getResult();
-foreach ($result->getItems() as $page) {
-    echo ($page['isCurrent'] ? '<strong>' : '') . "<a href='{$page['url']}'>{$page['pageNum']}</a>" . ($page['isCurrent'] ? '</strong>' : '');
+```php
+$builder = $paginator->getBuilder();
+
+$builder->getPrevItem(); // Item|null
+
+foreach ($builder->getItems() as $item) {
+    echo <<<HTML
+        <li class="{$item->isActive() ? 'active' : ''}">
+            <a href="{$item->getUrl()}" class="">
+                {$item->getContent()}
+            </a>
+        </li>
+    HTML;
 }
+
+$builder->getNextItem(); // Item|null
 ```
 
-### Pagination Structure
-The `PaginationResult` generates an array with:
+### Pagination Items
+
+The `Builder::getItems()` generates an array of `Item`:
 ```php
 [
-    ['pageNum' => 1,     'url' => '/page/1',  'isCurrent' => false],
-    ['pageNum' => '...', 'url' => null,       'isCurrent' => false],
-    ['pageNum' => 3,     'url' => '/page/3',  'isCurrent' => false],
-    ['pageNum' => 4,     'url' => '/page/4',  'isCurrent' => true ],
-    ['pageNum' => 5,     'url' => '/page/5',  'isCurrent' => false],
-    ['pageNum' => '...', 'url' => null,       'isCurrent' => false],
-    ['pageNum' => 10,    'url' => '/page/10', 'isCurrent' => false],
+    new Item(), 
+    new Item(),
+    new Item(), 
 ]
 ```
 
-## Pagination Builder
+Where an `Item` contains getters and setters for the following properties:
 
-For structured HTML generation, use the `PaginationBuilder`. This class converts pagination data into an HTML structure with `ul` and `li` elements, making it easy to integrate into any UI.
+```php
+class Item {
+    protected ?string $url = null;
+    protected bool $active = false;
+    protected int $pageNumber = 0;
+    protected string|NodeInterface $content = '';
+}
+```
+
+---
+
+For structured HTML generation, use can still use the `Builder`. This class converts pagination data into an HTML structure with `ul` and `li` elements, making it easy to integrate into any UI.
 
 ### Example Usage
-```php
-use Ucscode\Paginator\Pagination\PaginationBuilder;
 
+```php
 $builder = $paginator->getBuilder();
+
 echo $builder->render();
 ```
 
-### Customizing Navigation Text
-You can customize the previous and next navigation text:
-```php
-$builder->setPreviousText('&laquo;'); // Set custom previous button
-$builder->setNextText('&raquo;');     // Set custom next button
+The will generate HTML similar to bootstrap 5 pagination:
+
+```html
+<nav class="navigation" aria-label="...">
+    <ul class="pagination">
+        <li class="page-item disabled">
+            <span class="page-link">&laquo;</span>
+        </li>
+        <li class="page-item">
+            <a class="page-link" href="?page=1">1</a>
+        </li>
+        <li class="page-item active" aria-current="page">
+            <span class="page-link">2</span>
+        </li>
+        <li class="page-item">
+            <a class="page-link" href="?page=3">3</a>
+        </li>
+        <li class="page-item">
+            <a class="page-link" href="#">&raquo;</a>
+        </li>
+    </ul>
+</nav>
 ```
 
-### Example Output
-The `PaginationBuilder` generates the following HTML structure:
-```html
-<div class="navigation">
-    <ul class="pagination">
-        <li class="page-item"><a href="/page/1" class="page-link">1</a></li>
-        <li class="page-item disabled"><span class="page-link">...</span></li>
-        <li class="page-item active"><a href="/page/4" class="page-link">4</a></li>
-        <li class="page-item"><a href="/page/5" class="page-link">5</a></li>
-        <li class="page-item disabled"><span class="page-link">...</span></li>
-        <li class="page-item"><a href="/page/10" class="page-link">10</a></li>
-    </ul>
-</div>
+### Updating the HTML Element
+
+You can customize the HTML Element before rendering it by taking advantage of the [UssElement Library](https://github.com/ucscode/uss-element).
+
+```php
+$navElement = $builder->createElement();
+
+$navElement->getClassList()->add('my-nav-class');
+$navElement->setAttribute('data-name', 'pagination');
+
+$ulElement = $navElement->querySelector('ul.pagination');
+
+$ulElement->setAttribute('id', 'nav-id')
 ```
+
+Checkout [UssELement](https://github.com/ucscode/uss-element) and read the official documentation for more details 
 
 ## Acknowledgement
 

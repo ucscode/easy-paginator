@@ -67,10 +67,15 @@ class Item
     // For custom design, extend the Item class and override the `createElement()` method
     public function createElement(): ElementInterface
     {
-        $item = new ElementNode(NodeNameEnum::NODE_LI, ['class' => 'page-item']);
-        $link = new ElementNode($this->url ? NodeNameEnum::NODE_A : NodeNameEnum::NODE_SPAN, ['class' => 'page-link']);
+        $linkNodeName = !$this->url || $this->active ? NodeNameEnum::NODE_SPAN : NodeNameEnum::NODE_A;
 
-        $this->url ? $link->setAttribute('href', $this->url) : $item->getClassList()->add('disabled');
+        $item = new ElementNode(NodeNameEnum::NODE_LI, ['class' => 'page-item']);
+        $link = new ElementNode($linkNodeName, ['class' => 'page-link']);
+
+        !$this->url ?
+            $item->getClassList()->add('disabled') :
+            ($linkNodeName === NodeNameEnum::NODE_A ? $link->setAttribute('href', $this->url) : null)
+        ;
 
         if ($this->active) {
             $item

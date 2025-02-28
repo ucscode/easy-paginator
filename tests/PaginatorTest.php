@@ -4,7 +4,7 @@ namespace Ucscode\Paginator\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Ucscode\Paginator\Pagination\BuilderFactory;
+use Ucscode\Paginator\Pagination\Builder;
 use Ucscode\Paginator\Paginator;
 
 class PaginatorTest extends TestCase
