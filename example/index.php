@@ -14,6 +14,6 @@ $paginator = new Paginator(20, 3, $_GET['page'] ?? 1);
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     </head>
     <body>
-        <?php echo $paginator->getBuilder(5)->render(); ?>
+        <?php echo $paginator->getBuilder(5)->render(1); ?>
     </body>
 </html>

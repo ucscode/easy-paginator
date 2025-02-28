@@ -34,9 +34,9 @@ class Builder implements \Stringable
         return $this->render();
     }
 
-    public function render(): string
+    public function render(?int $indent = null): string
     {
-        return $this->createElement()->render();
+        return $this->createElement()->render($indent);
     }
 
     /**
